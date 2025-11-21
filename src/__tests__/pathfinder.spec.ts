@@ -1,4 +1,5 @@
 import { Node, Pathfinder } from '#utils/pathfinder.js';
+import { NoPathFoundError } from '#utils/pathfinderErrors.js';
 import { describe, expect, it } from 'vitest';
 
 describe('test mazeString function', () => {
@@ -121,10 +122,10 @@ describe('test solve method', () => {
         expect(pathfinder3.solve()).toEqual('FPPWWPPPPPWWPPS');
     });
 
-    it('should return an empty string if maze is not solvable', () => {
+    it('should throw an error if maze is not solvable', () => {
         const pathfinder1: Pathfinder = new Pathfinder('S  WWW     F', 4, 3);
         const pathfinder2: Pathfinder = new Pathfinder('SWF', 1, 3);
-        expect(pathfinder1.solve()).toEqual('');
-        expect(pathfinder2.solve()).toEqual('');
+        expect(() => pathfinder1.solve()).toThrowError(NoPathFoundError);
+        expect(() => pathfinder2.solve()).toThrowError(NoPathFoundError);
     });
 });

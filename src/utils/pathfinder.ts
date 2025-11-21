@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { PriorityQueue } from 'priority-queue-typescript';
 
+import { InvalidMazeError, NoPathFoundError } from './pathfinderErrors.js';
+
 class Node {
     public get col(): number {
         return this._col;
@@ -274,7 +276,7 @@ class Pathfinder {
             });
         }
 
-        return '';
+        throw new NoPathFoundError();
     };
 
     public updateMaze = (updatedNodes: Node[]): void => {
@@ -295,19 +297,21 @@ class Pathfinder {
         let finish!: Node;
 
         if (mazeString.length != row * col) {
-            throw new Error(
+            throw new InvalidMazeError(
                 'mazeString does not fit the specified width and height'
             );
         } else if (!(mazeString.includes('S') && mazeString.includes('F'))) {
-            throw new Error('mazeString does not contain a start or finish');
+            throw new InvalidMazeError(
+                'mazeString does not contain a start or finish'
+            );
         }
 
         // eslint-disable-next-line @typescript-eslint/no-misused-spread
         if ([...mazeString].filter((i) => i === 'S').length > 1) {
-            throw new Error('mazeString has more than one start');
+            throw new InvalidMazeError('mazeString has more than one start');
             // eslint-disable-next-line @typescript-eslint/no-misused-spread
         } else if ([...mazeString].filter((i) => i === 'F').length > 1) {
-            throw new Error('mazeString has more than one finish');
+            throw new InvalidMazeError('mazeString has more than one finish');
         }
 
         let currentCharIndex = 0;
@@ -324,7 +328,9 @@ class Pathfinder {
                         finish = new Node(i, j, null, 0);
                     }
                 } else {
-                    throw new Error('mazeString contains an invalid character');
+                    throw new InvalidMazeError(
+                        'mazeString contains an invalid character'
+                    );
                 }
 
                 currentCharIndex += 1;
