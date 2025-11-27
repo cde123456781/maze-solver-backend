@@ -121,12 +121,12 @@ class Pathfinder {
 
     private counter = 0;
 
-    public constructor(mazeString: string, width: number, height: number) {
+    public constructor(mazeString: string, row: number, col: number) {
         let start: Node;
         [this.mazeArray, start, this.goalNode] = this.decodeMazeString(
             mazeString,
-            width,
-            height
+            row,
+            col
         );
         this.nodesToCheck.add(start);
         this.currentBestCostMap.set([start.row, start.col].toString(), start);
