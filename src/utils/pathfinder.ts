@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { InvalidMazeError, NoPathFoundError } from '#utils/pathfinderErrors.js';
 import { PriorityQueue } from 'priority-queue-typescript';
-
-import { InvalidMazeError, NoPathFoundError } from './pathfinderErrors.js';
 
 class Node {
     public get col(): number {

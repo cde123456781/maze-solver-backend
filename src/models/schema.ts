@@ -8,7 +8,9 @@ const mazeTable = sqliteTable(
         isPublic: int('is_public').notNull(),
         mazeString: text('maze_string').notNull(),
         solvedMazeString: text('solved_maze_string').notNull(),
-        userId: int('user_id').references(() => userTable.id)
+        userId: int('user_id').references(() => userTable.id, {
+            onDelete: 'cascade'
+        })
     },
     (table) => [
         check(

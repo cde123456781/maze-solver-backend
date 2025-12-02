@@ -34,17 +34,22 @@
     "homepage": "https://github.com/cde123456781/maze-solver-backend#readme",
     "dependencies": {
         "@libsql/client": "^0.15.15",
+        "bcrypt": "^6.0.0",
+        "cookie-parser": "^1.4.7",
         "dotenv": "^17.2.3",
         "drizzle-orm": "^0.44.7",
         "drizzle-zod": "^0.8.3",
         "express": "^5.1.0",
+        "jsonwebtoken": "^9.0.2",
         "priority-queue-typescript": "^2.0.3",
         "zod": "^4.1.12"
     },
     "devDependencies": {
         "@eslint/js": "^9.39.1",
         "@tsconfig/node22": "^22.0.2",
+        "@types/bcrypt": "^6.0.0",
         "@types/express": "^5.0.5",
+        "@types/jsonwebtoken": "^9.0.10",
         "@types/node": "^24.10.1",
         "@types/supertest": "^6.0.3",
         "@vitest/coverage-v8": "^4.0.8",
