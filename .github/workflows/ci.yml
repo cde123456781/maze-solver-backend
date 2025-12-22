@@ -9,6 +9,8 @@ on:
 env:
     PORT: 3000
     DB_FILE_NAME: file:local.db
+    ACCESS_JWT_SECRET: accesstest
+    REFRESH_JWT_SECRET: refreshtest
 
 jobs:
     quality-checks:

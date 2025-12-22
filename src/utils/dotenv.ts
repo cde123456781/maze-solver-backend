@@ -16,12 +16,20 @@ const getDatabaseName = (): string => {
     }
 };
 
-const getJWTSecret = (): string => {
-    if (process.env.JWT_SECRET) {
-        return process.env.JWT_SECRET;
+const getRefreshJWTSecret = (): string => {
+    if (process.env.REFRESH_JWT_SECRET) {
+        return process.env.REFRESH_JWT_SECRET;
     } else {
-        throw new Error('JWT_SECRET is not in .env');
+        throw new Error('REFRESH_JWT_SECRET is not in .env');
     }
 };
 
-export { getDatabaseName, getJWTSecret, getPort };
+const getAccessJWTSecret = (): string => {
+    if (process.env.ACCESS_JWT_SECRET) {
+        return process.env.ACCESS_JWT_SECRET;
+    } else {
+        throw new Error('ACCESS_JWT_SECRET is not in .env');
+    }
+};
+
+export { getAccessJWTSecret, getDatabaseName, getPort, getRefreshJWTSecret };
