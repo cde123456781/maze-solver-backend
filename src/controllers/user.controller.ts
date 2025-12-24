@@ -166,8 +166,13 @@ const getUser = async (req: Request, res: Response): Promise<void> => {
             const mazes: {
                 id: number;
                 mazeString: string;
+                name: string;
             }[] = await db
-                .select({ id: mazeTable.id, mazeString: mazeTable.mazeString })
+                .select({
+                    id: mazeTable.id,
+                    mazeString: mazeTable.mazeString,
+                    name: mazeTable.name
+                })
                 .from(mazeTable)
                 .where(eq(mazeTable.userId, parseInt(userParam)));
             res.status(200).json({ mazes: mazes, user: user[0] });

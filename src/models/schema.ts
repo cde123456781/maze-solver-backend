@@ -7,6 +7,7 @@ const mazeTable = sqliteTable(
         id: int('id').primaryKey({ autoIncrement: true }),
         isPublic: int('is_public').notNull(),
         mazeString: text('maze_string').notNull(),
+        name: text('name').notNull(),
         solvedMazeString: text('solved_maze_string').notNull(),
         userId: int('user_id')
             .notNull()
@@ -18,6 +19,10 @@ const mazeTable = sqliteTable(
         check(
             'isPublic_check',
             sql`${table.isPublic} = 1 OR ${table.isPublic} = 0`
+        ),
+        check(
+            'name_check',
+            sql`LENGTH(${table.name}) >= 1 AND LENGTH(${table.name}) <= 30`
         )
     ]
 );

@@ -74,10 +74,11 @@ describe('test getUser function', () => {
         );
 
         const body = res.body as {
-            mazes: { id: number; mazeString: string }[];
+            mazes: { id: number; mazeString: string; name: string }[];
             user: { id: number; username: string };
         };
 
+        expect(res.status).toEqual(200);
         expect(body.user.username).toEqual('test1');
     });
 });
