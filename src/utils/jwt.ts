@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { isBlacklisted } from '#middleware/authorisation.js';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -71,11 +72,32 @@ const getRefreshJti = (token: string): string | undefined => {
     return decoded.jti;
 };
 
+const validateAccessToken = async (
+    token: string
+): Promise<{ message: string; status: number }> => {
+    try {
+        const decoded = jwt.verify(token, getAccessJWTSecret()) as JwtPayload;
+        const jti = decoded.jti;
+        if (jti) {
+            if (await isBlacklisted(jti)) {
+                return { message: 'Invalid token', status: 403 };
+            } else {
+                return { message: 'Valid token', status: 200 };
+            }
+        } else {
+            return { message: 'Invalid or expired token', status: 401 };
+        }
+    } catch {
+        return { message: 'Invalid or expired token', status: 401 };
+    }
+};
+
 export {
     generateAccessToken,
     generateRefreshToken,
     getAccessJti,
     getAccessTokenSub,
     getRefreshJti,
-    getRefreshTokenSub
+    getRefreshTokenSub,
+    validateAccessToken
 };

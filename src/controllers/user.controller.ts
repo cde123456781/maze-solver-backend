@@ -1,5 +1,9 @@
 import { db } from '#config/db.js';
-import { blacklistTable, mazeTable, userTable } from '#models/schema.js';
+import {
+    blacklistTable,
+    mazeTable,
+    userTable
+} from '#models/database.schema.js';
 import { hash } from '#utils/hash.js';
 import { compare } from '#utils/hash.js';
 import {
@@ -164,18 +168,22 @@ const getUser = async (req: Request, res: Response): Promise<void> => {
             res.status(404).send('User not found');
         } else {
             const mazes: {
+                cols: number;
                 id: number;
                 mazeString: string;
                 name: string;
+                rows: number;
             }[] = await db
                 .select({
+                    cols: mazeTable.cols,
                     id: mazeTable.id,
                     mazeString: mazeTable.mazeString,
-                    name: mazeTable.name
+                    name: mazeTable.name,
+                    rows: mazeTable.rows
                 })
                 .from(mazeTable)
                 .where(eq(mazeTable.userId, parseInt(userParam)));
-            res.status(200).json({ mazes: mazes, user: user[0] });
+            res.status(200).send({ mazes: mazes, user: user[0] });
         }
     }
 };
@@ -192,6 +200,11 @@ const getUsers = async (req: Request, res: Response): Promise<void> => {
 };
 
 const login = async (req: Request, res: Response): Promise<void> => {
+    if (!req.body) {
+        res.status(400).send('Bad Request');
+        return;
+    }
+
     const { password, username } = req.body as {
         password: string;
         username: string;
@@ -215,10 +228,15 @@ const login = async (req: Request, res: Response): Promise<void> => {
                     const accessToken = generateAccessToken(user[0].id);
                     const refreshToken = generateRefreshToken(user[0].id);
 
-                    res.status(200).send({
-                        accessToken: accessToken,
-                        refreshToken: refreshToken
-                    });
+                    res.status(200)
+                        .cookie('refreshToken', refreshToken, {
+                            httpOnly: true,
+                            path: '/auth/refresh'
+                        })
+                        .send({
+                            accessToken: accessToken,
+                            refreshToken: refreshToken
+                        });
                 }
             }
         } catch (error) {

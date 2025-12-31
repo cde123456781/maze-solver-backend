@@ -1,6 +1,6 @@
 import { db } from '#config/db.js';
 import { app } from '#index.js';
-import * as schema from '#models/schema.js';
+import * as schema from '#models/database.schema.js';
 import { rootUrl } from '#routes/base.routes.js';
 import { reset } from 'drizzle-seed';
 import request from 'supertest';
@@ -9,7 +9,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 let userId: number;
 
 let accessToken: string;
-let refreshToken: string;
+let refreshTokenCookie: string;
 
 beforeAll(async () => {
     await reset(db, schema);
@@ -96,8 +96,13 @@ describe('test login function', () => {
             .post(rootUrl + '/users/login')
             .send(req2);
 
+        const res3 = await request(app)
+            .post(rootUrl + '/users/login')
+            .send();
+
         expect(res1.status).toEqual(400);
         expect(res2.status).toEqual(400);
+        expect(res3.status).toEqual(400);
     });
 
     it('should fail to login if credentials are incorrect', async () => {
@@ -129,10 +134,10 @@ describe('test login function', () => {
 
         expect(res1.status).toEqual(200);
 
-        const body = res1.body as { accessToken: string; refreshToken: string };
+        const body = res1.body as { accessToken: string };
 
         accessToken = body.accessToken;
-        refreshToken = body.refreshToken;
+        refreshTokenCookie = res1.headers['set-cookie'];
     });
 });
 
@@ -149,7 +154,7 @@ describe('test refresh function', () => {
         const res1 = await request(app)
             .post(rootUrl + '/refresh')
             .send()
-            .set('Cookie', ['refreshToken=aaa;']);
+            .set('Cookie', ['refreshToken=jlksjfalkdj;']);
 
         expect(res1.status).toEqual(403);
     });
@@ -158,7 +163,7 @@ describe('test refresh function', () => {
         const res1 = await request(app)
             .post(rootUrl + '/refresh')
             .send()
-            .set('Cookie', ['refreshToken=' + refreshToken + ';']);
+            .set('Cookie', [refreshTokenCookie]);
         expect(res1.status).toEqual(200);
 
         // try refreshing again with the old refreshToken
@@ -166,14 +171,14 @@ describe('test refresh function', () => {
         const res2 = await request(app)
             .post(rootUrl + '/refresh')
             .send()
-            .set('Cookie', ['refreshToken=' + refreshToken + ';']);
+            .set('Cookie', [refreshTokenCookie]);
         expect(res2.status).toEqual(403);
         expect(res2.text).toEqual('Invalid token');
 
-        const body = res1.body as { accessToken: string; refreshToken: string };
+        const body = res1.body as { accessToken: string };
 
         accessToken = body.accessToken;
-        refreshToken = body.refreshToken;
+        refreshTokenCookie = res1.headers['set-cookie'];
     });
 });
 
@@ -284,7 +289,7 @@ describe('test logout function', () => {
             .send()
             .set({
                 authorization: 'Bearer asdf',
-                cookie: 'refreshToken=' + refreshToken + ';'
+                cookie: refreshTokenCookie
             });
 
         expect(res2.status).toEqual(403);
@@ -297,7 +302,7 @@ describe('test logout function', () => {
             .send()
             .set({
                 authorization: 'Bearer ' + accessToken,
-                cookie: 'refreshToken=' + refreshToken + ';'
+                cookie: refreshTokenCookie
             });
 
         expect(res1.status).toEqual(200);
@@ -340,9 +345,9 @@ describe('test delete function', () => {
             .send(req1);
 
         expect(res1.status).toEqual(200);
-        const body = res1.body as { accessToken: string; refreshToken: string };
+        const body = res1.body as { accessToken: string };
         accessToken = body.accessToken;
-        refreshToken = body.refreshToken;
+        refreshTokenCookie = res1.headers['set-cookie'];
 
         const res2 = await request(app)
             .delete(rootUrl + '/users/delete/' + userId.toString())

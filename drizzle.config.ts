@@ -8,5 +8,5 @@ export default defineConfig({
     },
     dialect: 'sqlite',
     out: './drizzle',
-    schema: './src/models/*'
+    schema: './src/models/database.schema.ts'
 });

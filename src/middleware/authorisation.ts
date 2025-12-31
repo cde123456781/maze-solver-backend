@@ -1,7 +1,11 @@
 import { db } from '#config/db.js';
-import { blacklistTable, userTable } from '#models/schema.js';
-import { getAccessJWTSecret, getRefreshJWTSecret } from '#utils/dotenv.js';
-import { generateAccessToken, generateRefreshToken } from '#utils/jwt.js';
+import { blacklistTable, userTable } from '#models/database.schema.js';
+import { getRefreshJWTSecret } from '#utils/dotenv.js';
+import {
+    generateAccessToken,
+    generateRefreshToken,
+    validateAccessToken
+} from '#utils/jwt.js';
 import { eq } from 'drizzle-orm';
 import { Request, Response } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
@@ -30,32 +34,13 @@ const authenticateToken = async (
         if (!token) {
             res.status(401).send({ message: 'Token not found' });
         } else {
-            try {
-                const decoded = jwt.verify(
-                    token,
-                    getAccessJWTSecret()
-                ) as JwtPayload;
-                const jti = decoded.jti;
-                if (jti) {
-                    if (await isBlacklisted(jti)) {
-                        res.status(403).json({
-                            message: 'Invalid token'
-                        });
-                    } else {
-                        req.user = decoded;
-                        next();
-                    }
-                } else {
-                    res.status(401).json({
-                        message: 'Invalid or expired token'
-                    });
-                }
-            } catch (error) {
-                if (error) {
-                    res.status(401).json({
-                        message: 'Invalid or expired token'
-                    });
-                }
+            const validationResult = await validateAccessToken(token);
+            if (validationResult.status == 200) {
+                next();
+            } else {
+                res.status(validationResult.status).send(
+                    validationResult.message
+                );
             }
         }
     } else {
@@ -109,10 +94,14 @@ const refreshToken = async (req: Request, res: Response): Promise<void> => {
                 const accessToken = generateAccessToken(userId);
                 const refreshToken = generateRefreshToken(userId);
 
-                res.status(200).send({
-                    accessToken: accessToken,
-                    refreshToken: refreshToken
-                });
+                res.status(200)
+                    .cookie('refreshToken', refreshToken, {
+                        httpOnly: true,
+                        path: '/auth/refresh'
+                    })
+                    .send({
+                        accessToken: accessToken
+                    });
             }
         } else {
             res.status(403).json({

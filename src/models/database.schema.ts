@@ -1,13 +1,26 @@
+import {
+    MAX_COLS,
+    MAX_MAZE_NAME,
+    MAX_ROWS,
+    MAX_USERNAME,
+    MIN_COLS,
+    MIN_MAZE_NAME,
+    MIN_MAZE_STRING,
+    MIN_ROWS,
+    MIN_USERNAME
+} from '#utils/constants.js';
 import { sql } from 'drizzle-orm';
 import { check, int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 const mazeTable = sqliteTable(
     'mazes',
     {
+        cols: int('cols').notNull(),
         id: int('id').primaryKey({ autoIncrement: true }),
         isPublic: int('is_public').notNull(),
         mazeString: text('maze_string').notNull(),
         name: text('name').notNull(),
+        rows: int('rows').notNull(),
         solvedMazeString: text('solved_maze_string').notNull(),
         userId: int('user_id')
             .notNull()
@@ -22,7 +35,19 @@ const mazeTable = sqliteTable(
         ),
         check(
             'name_check',
-            sql`LENGTH(${table.name}) >= 1 AND LENGTH(${table.name}) <= 30`
+            sql`LENGTH(${table.name}) >= ${MIN_MAZE_NAME} AND LENGTH(${table.name}) <= ${MAX_MAZE_NAME}`
+        ),
+        check(
+            'cols_check',
+            sql`${table.cols} >= ${MIN_COLS} AND ${table.cols} <= ${MAX_COLS}`
+        ),
+        check(
+            'rows_check',
+            sql`${table.rows} >= ${MIN_ROWS} AND ${table.rows} <= ${MAX_ROWS}`
+        ),
+        check(
+            'maze_string_check',
+            sql`LENGTH(${table.mazeString}) >= ${MIN_MAZE_STRING}`
         )
     ]
 );
@@ -37,7 +62,7 @@ const userTable = sqliteTable(
     (table) => [
         check(
             'username_check',
-            sql`LENGTH(${table.username}) >= 5 AND LENGTH(${table.username}) <= 32`
+            sql`LENGTH(${table.username}) >= ${MIN_USERNAME} AND LENGTH(${table.username}) <= ${MAX_USERNAME}`
         )
     ]
 );
