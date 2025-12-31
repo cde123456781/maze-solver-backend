@@ -1,16 +1,16 @@
-import {
-    MAX_COLS,
-    MAX_MAZE_NAME,
-    MAX_ROWS,
-    MAX_USERNAME,
-    MIN_COLS,
-    MIN_MAZE_NAME,
-    MIN_MAZE_STRING,
-    MIN_ROWS,
-    MIN_USERNAME
-} from '#utils/constants.js';
 import { sql } from 'drizzle-orm';
 import { check, int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+const MIN_COLS = 2;
+const MIN_ROWS = 2;
+const MIN_MAZE_STRING = 4;
+const MIN_MAZE_NAME = 1;
+const MIN_USERNAME = 5;
+
+const MAX_COLS = 30;
+const MAX_ROWS = 30;
+const MAX_MAZE_NAME = 30;
+const MAX_USERNAME = 32;
 
 const mazeTable = sqliteTable(
     'mazes',
@@ -35,19 +35,19 @@ const mazeTable = sqliteTable(
         ),
         check(
             'name_check',
-            sql`LENGTH(${table.name}) >= ${MIN_MAZE_NAME} AND LENGTH(${table.name}) <= ${MAX_MAZE_NAME}`
+            sql`LENGTH(${table.name}) >= ${sql.raw(MIN_MAZE_NAME.toString())} AND LENGTH(${table.name}) <= ${sql.raw(MAX_MAZE_NAME.toString())}`
         ),
         check(
             'cols_check',
-            sql`${table.cols} >= ${MIN_COLS} AND ${table.cols} <= ${MAX_COLS}`
+            sql`${table.cols} >= ${sql.raw(MIN_COLS.toString())} AND ${table.cols} <= ${sql.raw(MAX_COLS.toString())}`
         ),
         check(
             'rows_check',
-            sql`${table.rows} >= ${MIN_ROWS} AND ${table.rows} <= ${MAX_ROWS}`
+            sql`${table.rows} >= ${sql.raw(MIN_ROWS.toString())} AND ${table.rows} <= ${sql.raw(MAX_ROWS.toString())}`
         ),
         check(
             'maze_string_check',
-            sql`LENGTH(${table.mazeString}) >= ${MIN_MAZE_STRING}`
+            sql`LENGTH(${table.mazeString}) >= ${sql.raw(MIN_MAZE_STRING.toString())}`
         )
     ]
 );
@@ -62,7 +62,7 @@ const userTable = sqliteTable(
     (table) => [
         check(
             'username_check',
-            sql`LENGTH(${table.username}) >= ${MIN_USERNAME} AND LENGTH(${table.username}) <= ${MAX_USERNAME}`
+            sql`LENGTH(${table.username}) >= ${sql.raw(MIN_USERNAME.toString())} AND LENGTH(${table.username}) <= ${sql.raw(MAX_USERNAME.toString())}`
         )
     ]
 );
@@ -72,4 +72,17 @@ const blacklistTable = sqliteTable('blacklist', {
     uuid: text('uuid').notNull().unique()
 });
 
-export { blacklistTable, mazeTable, userTable };
+export {
+    blacklistTable,
+    MAX_COLS,
+    MAX_MAZE_NAME,
+    MAX_ROWS,
+    MAX_USERNAME,
+    mazeTable,
+    MIN_COLS,
+    MIN_MAZE_NAME,
+    MIN_MAZE_STRING,
+    MIN_ROWS,
+    MIN_USERNAME,
+    userTable
+};

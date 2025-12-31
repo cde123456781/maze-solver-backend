@@ -6,7 +6,7 @@ import {
     MIN_MAZE_NAME,
     MIN_MAZE_STRING,
     MIN_ROWS
-} from '#utils/constants.js';
+} from '#models/database.schema.js';
 import z from 'zod';
 
 const solveSchema = z.object({
