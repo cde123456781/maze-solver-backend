@@ -142,3 +142,5 @@ vite.config.ts.timestamp-*
 
 # OS generated files
 .DS_Store
+
+local.db

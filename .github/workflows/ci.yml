@@ -1,42 +1,51 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - main
-      - dev
+    push:
+        branches:
+            - main
+            - dev
+
+env:
+    PORT: 3000
+    DB_FILE_NAME: file:local.db
+    ACCESS_JWT_SECRET: accesstest
+    REFRESH_JWT_SECRET: refreshtest
 
 jobs:
-  quality-checks:
-    runs-on: ubuntu-latest
+    quality-checks:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-          cache: "npm"
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+            - name: Install dependencies
+              run: npm ci
 
-      - name: Run tests
-        run: npm run test:run
+            - name: Setup database
+              run: npx drizzle-kit push
 
-      - name: Run TypeScript type checking
-        run: npm run type-check
+            - name: Run tests
+              run: npm run test:run
 
-      - name: Run ESLint and fix
-        run: npm run lint:fix
+            - name: Run TypeScript type checking
+              run: npm run type-check
 
-      - name: Format with Prettier
-        run: npm run format
+            - name: Run ESLint and fix
+              run: npm run lint:fix
 
-      - name: Check for remaining ESLint errors
-        run: npm run lint
+            - name: Format with Prettier
+              run: npm run format
 
-      - name: Check for remaining formatting issues
-        run: npm run format:check
+            - name: Check for remaining ESLint errors
+              run: npm run lint
+
+            - name: Check for remaining formatting issues
+              run: npm run format:check

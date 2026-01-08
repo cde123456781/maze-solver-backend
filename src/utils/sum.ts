@@ -1,4 +1,4 @@
 // sum.ts
 export function sum(a: number, b: number) {
-  return a + b;
+    return a + b;
 }
