@@ -4,11 +4,20 @@ import mazeRoutes from '#routes/maze.routes.js';
 import userRoutes from '#routes/user.routes.js';
 import { getPort } from '#utils/dotenv.js';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import express from 'express';
 
 const app = express();
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call
 app.use(cookieParser());
+
+const options: cors.CorsOptions = {
+    credentials: true,
+    origin: 'http://localhost:5173'
+};
+
+app.use(cors(options));
+
 app.use(express.json());
 const port = getPort();
 

@@ -5,6 +5,7 @@ import { Router } from 'express';
 const router = Router();
 
 router.get('/maze', maze.getMazes);
+router.get('/maze/loggedIn', authenticateToken, maze.getMazesLoggedIn);
 router.get('/maze/:id', maze.getMaze);
 router.post('/maze/solve', maze.solveMaze);
 router.post('/maze/create', authenticateToken, maze.createMaze);

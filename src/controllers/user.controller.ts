@@ -231,7 +231,8 @@ const login = async (req: Request, res: Response): Promise<void> => {
                     res.status(200)
                         .cookie('refreshToken', refreshToken, {
                             httpOnly: true,
-                            path: '/auth/refresh'
+                            path: '/auth/refresh',
+                            sameSite: 'lax'
                         })
                         .send({
                             accessToken: accessToken,

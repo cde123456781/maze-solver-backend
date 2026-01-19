@@ -141,32 +141,39 @@ const createMaze = async (req: Request, res: Response) => {
 
 const getMazes = async (req: Request, res: Response): Promise<void> => {
     try {
-        if (req.headers.authorization) {
-            const token = req.headers.authorization.split(' ')[1];
-
-            if (token) {
-                const validationResult = await validateAccessToken(token);
-                if (validationResult.status == 200) {
-                    const userId = getAccessTokenSub(token);
-                    const mazes = await db
-                        .select()
-                        .from(mazeTable)
-                        .where(
-                            sql`${mazeTable.isPublic} = 1 OR ${mazeTable.userId} = ${userId}`
-                        );
-
-                    res.status(200).send({ mazes: mazes });
-                    return;
-                }
-            }
-        }
-
         const mazes = await db
             .select()
             .from(mazeTable)
             .where(sql`${mazeTable.isPublic} = 1`);
 
         res.status(200).send({ mazes: mazes });
+    } catch {
+        res.status(500).send('Server Error');
+    }
+};
+
+const getMazesLoggedIn = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const authHeader = req.headers.authorization;
+
+        const accessToken = authHeader?.split(' ')[1];
+
+        if (!accessToken) {
+            res.status(403).send('No accessToken provided');
+            return;
+        }
+
+        const accessTokenUserId = getAccessTokenSub(accessToken);
+
+        const mazes = await db
+            .select()
+            .from(mazeTable)
+            .where(
+                sql`${mazeTable.isPublic} = 1 OR ${mazeTable.userId} = ${accessTokenUserId}`
+            );
+
+        res.status(200).send({ mazes: mazes });
+        return;
     } catch {
         res.status(500).send('Server Error');
     }
@@ -361,4 +368,12 @@ const updateMaze = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-export { createMaze, deleteMaze, getMaze, getMazes, solveMaze, updateMaze };
+export {
+    createMaze,
+    deleteMaze,
+    getMaze,
+    getMazes,
+    getMazesLoggedIn,
+    solveMaze,
+    updateMaze
+};

@@ -130,7 +130,7 @@ describe('test createMaze function', () => {
 describe('test getMazes function', () => {
     it('should retrieve all mazes successfully', async () => {
         const res = await request(app)
-            .get(rootUrl + '/maze')
+            .get(rootUrl + '/maze/loggedIn')
             .send()
             .set({ authorization: 'Bearer ' + accessToken });
 
@@ -144,6 +144,23 @@ describe('test getMazes function', () => {
         expect(body.mazes[0].userId).toEqual(userId);
 
         mazeId = body.mazes[0].id;
+    });
+
+    it('should return status code 403 if access code is invalid', async () => {
+        const res = await request(app)
+            .get(rootUrl + '/maze/loggedIn')
+            .send()
+            .set({ authorization: 'Bearer ' + accessToken + 'sd' });
+
+        expect(res.status).toEqual(401);
+    });
+
+    it('should return status code 403 if access code is not provided', async () => {
+        const res = await request(app)
+            .get(rootUrl + '/maze/loggedIn')
+            .send();
+
+        expect(res.status).toEqual(401);
     });
 
     it('should not retrieve private mazes if not logged in', async () => {
